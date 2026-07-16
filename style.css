@@ -4,7 +4,7 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#10182e;fon
 button{font:inherit;color:inherit}
 .screen{position:absolute;inset:0;display:none}
 .screen.active{display:block}
-#title-screen{background:url('assets/campus-gate.png') center/cover no-repeat}
+#title-screen{background:url('assets/campus-gate.webp') center/cover no-repeat}
 .title-shade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(13,24,50,.92) 0%,rgba(13,24,50,.62) 42%,rgba(13,24,50,.08) 75%),linear-gradient(0deg,rgba(10,17,35,.72),transparent 50%)}
 .title-wrap{position:absolute;left:8vw;top:50%;transform:translateY(-50%);width:min(560px,84vw)}
 .eyebrow{letter-spacing:.38em;color:#bce7f5;font-size:12px;margin:0 0 16px}
@@ -33,6 +33,8 @@ button{font:inherit;color:inherit}
 .progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--pink));transition:.4s}
 .track-chip{display:flex;align-items:center;gap:7px;max-width:230px;padding:7px 13px;border:1px solid rgba(255,255,255,.2);border-radius:18px;background:rgba(10,18,40,.48);backdrop-filter:blur(9px);font-size:11px;letter-spacing:.05em;white-space:nowrap;overflow:hidden}
 .track-chip span{color:#ffd0df;font-size:15px}.track-chip b{overflow:hidden;text-overflow:ellipsis;font-weight:500}
+.track-chip[data-status="loading"] span{animation:musicPulse .85s ease-in-out infinite alternate}.controls button.waiting{opacity:1;color:#ffd0df}
+@keyframes musicPulse{to{opacity:.35;transform:scale(.82)}}
 .relationship-hud{position:absolute;z-index:3;right:3vw;top:11vh;width:210px;padding:13px 15px;border:1px solid rgba(255,255,255,.2);border-radius:7px;background:rgba(12,22,48,.68);backdrop-filter:blur(12px);box-shadow:0 12px 30px rgba(5,10,25,.25);opacity:0;transform:translateY(-12px);pointer-events:none;transition:.45s}
 .relationship-hud.visible{opacity:1;transform:none}.relationship-hud header{display:flex;justify-content:space-between;align-items:center;padding-bottom:9px;margin-bottom:8px;border-bottom:1px solid rgba(255,255,255,.13);font-size:12px;letter-spacing:.15em}.relationship-hud header strong{font:22px Georgia;color:#ffb8cf;letter-spacing:0}
 .stat{display:grid;grid-template-columns:34px 1fr 25px;align-items:center;gap:8px;margin:7px 0;font-size:10px}.stat label{opacity:.8}.stat i{display:block;height:4px;background:rgba(255,255,255,.14);border-radius:4px;overflow:hidden}.stat i b{display:block;height:100%;width:0;border-radius:4px;transition:.65s cubic-bezier(.2,.8,.2,1)}.stat em{font-style:normal;text-align:right;opacity:.78}.stat-heart i b{background:#ff7fa7}.stat-trust i b{background:#63c8ef}.stat-harmony i b{background:#69d6a4}
@@ -66,15 +68,15 @@ button{font:inherit;color:inherit}
 .chapter-splash.show{display:grid}
 .chapter-splash b{display:block;font-size:48px;color:#ffcadb}
 .chapter-splash small{font:12px sans-serif;letter-spacing:.35em;color:#aee2ef}
-.location-gate{background-image:url('assets/campus-gate.png')}
-.location-classroom{background-image:url('assets/campus-classroom.png');background-position:center}
-.location-corridor{background-image:url('assets/campus-twoheroes.png');background-position:center}
-.location-field{background-image:url('assets/campus-field.png');background-position:center}
-.location-rooftop{background-image:url('assets/campus-rooftop.png');background-position:center}
-.location-library{background-image:url('assets/campus-library.png');background-position:center}
-.location-festival{background-image:url('assets/campus-festival.png');background-position:center}
-.location-outing{background-image:url('assets/qingguo-lane.png');background-position:center}
-.location-stars{background-image:url('assets/campus-stars.png');background-position:center}
+.location-gate{background-image:url('assets/campus-gate.webp')}
+.location-classroom{background-image:url('assets/campus-classroom.webp');background-position:center}
+.location-corridor{background-image:url('assets/campus-twoheroes.webp');background-position:center}
+.location-field{background-image:url('assets/campus-field.webp');background-position:center}
+.location-rooftop{background-image:url('assets/campus-rooftop.webp');background-position:center}
+.location-library{background-image:url('assets/campus-library.webp');background-position:center}
+.location-festival{background-image:url('assets/campus-festival.webp');background-position:center}
+.location-outing{background-image:url('assets/qingguo-lane.webp');background-position:center}
+.location-stars{background-image:url('assets/campus-stars.webp');background-position:center}
 dialog{width:min(920px,92vw);max-height:84vh;border:1px solid rgba(255,255,255,.22);border-radius:8px;background:#17213df2;color:#fff;padding:36px;box-shadow:0 30px 80px #050914;overflow:auto}
 dialog::backdrop{background:#050914b8;backdrop-filter:blur(5px)}
 .modal-close{position:absolute;right:15px;top:10px;border:0;background:transparent;font-size:28px;cursor:pointer}

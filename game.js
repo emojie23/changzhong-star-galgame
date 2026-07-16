@@ -300,31 +300,49 @@ const state={chapter:0,line:0,affection:0,trust:0,harmony:0,log:[],auto:false,sk
 const $=s=>document.querySelector(s), title=$('#title-screen'), game=$('#game-screen'), dialogue=$('#dialogue'), text=$('#text'), speaker=$('#speaker'), heroine=$('#heroine'), choices=$('#choices'), modal=$('#modal'), modalContent=$('#modal-content');
 const total=chapters.reduce((n,c)=>n+c.lines.length,0);
 const heroineAssets={
-  neutral:'assets/xiongli-cutout.png',surprised:'assets/xiongli-surprised-cutout.png',pout:'assets/xiongli-pout-cutout.png',shy:'assets/xiongli-shy-cutout.png',worried:'assets/xiongli-worried-cutout.png',
-  sports:'assets/xiongli-sports-cutout.png',outing:'assets/xiongli-outing-cutout.png',winter:'assets/xiongli-winter-cutout.png',festival:'assets/xiongli-festival-cutout.png'
+  neutral:'assets/xiongli-cutout.webp',surprised:'assets/xiongli-surprised-cutout.webp',pout:'assets/xiongli-pout-cutout.webp',shy:'assets/xiongli-shy-cutout.webp',worried:'assets/xiongli-worried-cutout.webp',
+  sports:'assets/xiongli-sports-cutout.webp',outing:'assets/xiongli-outing-cutout.webp',winter:'assets/xiongli-winter-cutout.webp',festival:'assets/xiongli-festival-cutout.webp'
+};
+const sceneAssets={
+  gate:'assets/campus-gate.webp',classroom:'assets/campus-classroom.webp',corridor:'assets/campus-twoheroes.webp',field:'assets/campus-field.webp',
+  rooftop:'assets/campus-rooftop.webp',library:'assets/campus-library.webp',festival:'assets/campus-festival.webp',outing:'assets/qingguo-lane.webp',stars:'assets/campus-stars.webp'
 };
 const chapterLooks={3:'sports',5:'festival',6:'festival',7:'winter',8:'outing',10:'shy'};
 const tracks={
-  morning:{src:'assets/audio/a-new-day.ogg',title:'A New Day · 清晨'},
+  morning:{src:'assets/audio/a-new-day.mp3',title:'A New Day · 清晨'},
   daily:{src:'assets/audio/peaceful-ville.mp3',title:'Peaceful Ville · 日常'},
   rain:{src:'assets/audio/morning-rain.mp3',title:'Morning Rain · 雨天'},
-  festival:{src:'assets/audio/apple-cider.ogg',title:'Apple Cider · 灯火'},
+  festival:{src:'assets/audio/apple-cider.mp3',title:'Apple Cider · 灯火'},
   stars:{src:'assets/audio/confession-piano.mp3',title:'JRPG2 Piano · 星光'}
 };
 const chapterTracks=['morning','daily','daily','daily','rain','festival','festival','morning','daily','rain','stars'];
 const choiceGains=[{heart:10,trust:9,harmony:8},{heart:9,trust:8,harmony:10}];
-let typeTimer,autoTimer,bgm,fadeTimer,currentTrackKey='morning';
-const MUSIC_VOLUME=.42;
-Object.values(heroineAssets).forEach(src=>{const img=new Image();img.src=src});
+let typeTimer,autoTimer,bgm,pendingBgm,fadeTimer,currentTrackKey='morning',musicNeedsGesture=false;
+const MUSIC_VOLUME=.60;
+const preloadedTracks=new Map(),preloadedImages=new Map();
+const idleTask=window.requestIdleCallback?callback=>window.requestIdleCallback(callback,{timeout:3000}):callback=>setTimeout(callback,650);
 
 function absoluteIndex(){return chapters.slice(0,state.chapter).reduce((n,c)=>n+c.lines.length,0)+state.line}
 function bgClass(loc){return `location-${loc}`}
+function preloadImage(src){
+  if(!src||preloadedImages.has(src))return;
+  const image=new Image();image.decoding='async';image.src=src;preloadedImages.set(src,image);
+}
+function scheduleUpcomingAssets(){
+  const nextIndex=state.chapter+1;if(nextIndex>=chapters.length)return;
+  idleTask(()=>{
+    const nextChapter=chapters[nextIndex];preloadImage(sceneAssets[nextChapter.loc]);
+    preloadImage(heroineAssets[chapterLooks[nextIndex]||'neutral']);
+    const nextTrackKey=chapterTracks[nextIndex];if(nextTrackKey&&nextTrackKey!==currentTrackKey)preloadTrack(nextTrackKey);
+  });
+}
 function enterChapter(show=true){
   const c=chapters[state.chapter];
   $('#bg').className=`scene-bg ${bgClass(c.loc)}`;
   game.dataset.scene=c.loc;
   $('.location-card').innerHTML=`<span>${String(state.chapter+1).padStart(2,'0')}</span><div><b>${c.place}</b><small>${c.sub}</small></div>`;
   changeMusic(chapterTracks[state.chapter]||'daily');
+  scheduleUpcomingAssets();
   const chapterLook=chapterLooks[state.chapter];
   if(chapterLook&&state.heroineIntroduced){heroine.src=heroineAssets[chapterLook]}
   if(show){
@@ -396,14 +414,88 @@ function chapterModal(){openModal(`<h2 class="modal-title">章节回想</h2><div
 function mapModal(){openModal(`<h2 class="modal-title">省常中 · 故事导览图</h2><p>基于公开校园信息和用户提供的两杰广场参考图进行艺术化近似建模，仅用于叙事导览，不是校方正式地图或测绘图。</p><div class="campus-map"><div class="map-ground"><div class="building b1">教学楼</div><div class="building b2">图书馆 / 钟楼</div><div class="building b3">南门 · 罗汉路</div><div class="field"></div><span class="map-label" style="left:39%;top:39%">两杰广场 · 香樟路</span><span class="map-label" style="right:5%;bottom:17%">东操场 · 秘密基地</span></div></div><p>故事取景：南门 → 高一（7）班 → 两杰广场 → 东操场 → 图书馆 → 钟楼露台，并延伸到青果巷。两杰广场场景保留浅色双人半身像、深红基座、红花与修剪绿植等真实视觉锚点。</p>`)}
 function about(){openModal(`<h2 class="modal-title">创作说明</h2><p>这是一部全年龄、纯甜向的同人视觉小说。熊莉的视觉形象参考网络创作者“兔娘”的公开形象特征，人物经历、同校设定、对白与恋爱故事均为艺术化虚构，不代表本人经历或观点。</p><p>江苏省常州高级中学创办于 1907 年，坐落于常州市中心；场景依据公开校园信息、校园风景和两杰广场参考图作近似设计，不包含精确安防、室内或测绘数据。</p><h3>CC0 配乐</h3><p>A New Day — SpiderDave；peacefull ville — Bobjt；Morning rain — TAD；Apple Cider — Zane Little Music；JRPG2 Piano — Joth。均来自 OpenGameArt，随游戏本地分发并按剧情淡入淡出。</p><p>角色参考图仅用于生成阶段的外观锚定，不在游戏内分发。游戏人物和背景为原创 AI 插画。</p>`)}
 function backlog(){openModal(`<h2 class="modal-title">对话回看</h2><div class="backlog">${state.log.map(x=>`<div class="log-row"><b>${x[0]}</b>${x[1]}</div>`).join('')}</div>`)}
-function changeMusic(key,force=false){
-  currentTrackKey=key;const track=tracks[key]||tracks.daily;$('#track-chip b').textContent=track.title;
-  if(!state.music)return;if(!force&&bgm&&bgm.dataset.key===key)return;
-  clearInterval(fadeTimer);const old=bgm,nextAudio=new Audio(track.src);nextAudio.loop=true;nextAudio.preload='auto';nextAudio.volume=0;nextAudio.dataset.key=key;bgm=nextAudio;
-  nextAudio.play().catch(()=>{});let step=0,oldVolume=old?old.volume:0;
-  fadeTimer=setInterval(()=>{step++;const p=Math.min(1,step/24);nextAudio.volume=MUSIC_VOLUME*p;if(old)old.volume=oldVolume*(1-p);if(p>=1){clearInterval(fadeTimer);if(old){old.pause();old.src=''}}},70);
+function setTrackStatus(label,status='ready'){
+  const chip=$('#track-chip');chip.dataset.status=status;chip.querySelector('b').textContent=label;
 }
-function toggleMusic(button){state.music=!state.music;button.classList.toggle('off',!state.music);button.textContent=state.music?'♪ 音乐 42%':'♪ 已静音';if(state.music)changeMusic(currentTrackKey,true);else if(bgm){bgm.pause();bgm=null}}
+function updateMusicButton(label=`♪ 音乐 ${Math.round(MUSIC_VOLUME*100)}%`,waiting=false){
+  const button=$('#music-btn');button.textContent=label;button.classList.toggle('waiting',waiting);button.classList.toggle('off',!state.music);
+}
+function createTrackAudio(key){
+  const track=tracks[key]||tracks.daily,audio=new Audio();
+  audio.src=track.src;audio.loop=true;audio.preload='auto';audio.playsInline=true;audio.volume=0;audio.dataset.key=key;audio.load();
+  return audio;
+}
+function preloadTrack(key){
+  if(!key||preloadedTracks.has(key)||bgm?.dataset.key===key||pendingBgm?.dataset.key===key)return;
+  preloadedTracks.set(key,createTrackAudio(key));
+}
+function releaseAudio(audio){
+  if(!audio)return;audio.pause();audio.removeAttribute('src');audio.load();
+}
+function showMusicRetry(audio,message='点击开启音乐'){
+  if(pendingBgm!==audio)return;
+  const track=tracks[audio.dataset.key]||tracks.daily;musicNeedsGesture=true;
+  setTrackStatus(`${track.title} · ${message}`,'waiting');updateMusicButton('♪ 点击开启音乐',true);
+}
+function beginMusicFade(nextAudio,old){
+  if(!state.music){releaseAudio(nextAudio);return}
+  if(pendingBgm!==nextAudio&&bgm!==nextAudio)return;
+  clearInterval(fadeTimer);pendingBgm=null;bgm=nextAudio;musicNeedsGesture=false;
+  const track=tracks[nextAudio.dataset.key]||tracks.daily;setTrackStatus(`${track.title} · 播放中`,'playing');updateMusicButton();
+  let step=0,oldVolume=old&&!old.paused?old.volume:0;nextAudio.volume=0;
+  fadeTimer=setInterval(()=>{
+    step++;const progress=Math.min(1,step/24);nextAudio.volume=MUSIC_VOLUME*progress;
+    if(old&&old!==nextAudio)old.volume=oldVolume*(1-progress);
+    if(progress>=1){clearInterval(fadeTimer);if(old&&old!==nextAudio)releaseAudio(old)}
+  },70);
+}
+function playPendingTrack(nextAudio,old){
+  const track=tracks[nextAudio.dataset.key]||tracks.daily;nextAudio.muted=false;
+  setTrackStatus(`${track.title} · 加载中…`,'loading');
+  try{
+    const result=nextAudio.play();
+    if(result&&typeof result.then==='function')result.then(()=>beginMusicFade(nextAudio,old)).catch(()=>showMusicRetry(nextAudio));
+    else beginMusicFade(nextAudio,old);
+  }catch(error){showMusicRetry(nextAudio)}
+}
+function changeMusic(key,force=false){
+  currentTrackKey=key;const track=tracks[key]||tracks.daily;
+  if(!state.music){setTrackStatus(`${track.title} · 已静音`,'muted');return}
+  if(!force&&bgm?.dataset.key===key&&!bgm.paused){setTrackStatus(`${track.title} · 播放中`,'playing');return}
+  if(!force&&pendingBgm?.dataset.key===key)return;
+  if(pendingBgm&&pendingBgm.dataset.key!==key){releaseAudio(pendingBgm);pendingBgm=null}
+  clearInterval(fadeTimer);const old=bgm,nextAudio=preloadedTracks.get(key)||createTrackAudio(key);preloadedTracks.delete(key);
+  pendingBgm=nextAudio;
+  nextAudio.addEventListener('waiting',()=>{if(pendingBgm===nextAudio)setTrackStatus(`${track.title} · 缓冲中…`,'loading')});
+  nextAudio.addEventListener('error',()=>{if(pendingBgm===nextAudio)showMusicRetry(nextAudio,'加载失败，点击重试')},{once:true});
+  playPendingTrack(nextAudio,old);
+}
+function retryMusic(){
+  state.music=true;updateMusicButton();
+  if(pendingBgm){
+    if(pendingBgm.error){releaseAudio(pendingBgm);pendingBgm=null;changeMusic(currentTrackKey,true);return}
+    musicNeedsGesture=false;playPendingTrack(pendingBgm,bgm);return;
+  }
+  if(bgm?.paused){
+    const audio=bgm,track=tracks[audio.dataset.key]||tracks.daily;
+    setTrackStatus(`${track.title} · 加载中…`,'loading');
+    audio.play().then(()=>{musicNeedsGesture=false;audio.volume=MUSIC_VOLUME;setTrackStatus(`${track.title} · 播放中`,'playing');updateMusicButton()}).catch(()=>{pendingBgm=audio;bgm=null;showMusicRetry(audio)});
+    return;
+  }
+  changeMusic(currentTrackKey,true);
+}
+function toggleMusic(button){
+  if(state.music&&bgm&&!bgm.paused&&!musicNeedsGesture){
+    state.music=false;clearInterval(fadeTimer);releaseAudio(pendingBgm);releaseAudio(bgm);pendingBgm=bgm=null;
+    const track=tracks[currentTrackKey]||tracks.daily;setTrackStatus(`${track.title} · 已静音`,'muted');updateMusicButton('♪ 已静音');
+  }else retryMusic();
+}
+preloadTrack('morning');
+document.addEventListener('pointerdown',event=>{
+  if(event.target instanceof Element&&event.target.closest('#music-btn'))return;
+  if(state.music&&musicNeedsGesture)retryMusic();
+},{capture:true});
+document.addEventListener('keydown',()=>{if(state.music&&musicNeedsGesture)retryMusic()},{capture:true});
 $('#start-btn').onclick=()=>start();$('#continue-btn').onclick=load;$('#chapter-btn').onclick=chapterModal;$('#about-btn').onclick=about;$('#modal-close').onclick=()=>modal.close();$('#map-btn').onclick=mapModal;$('#backlog-btn').onclick=e=>{e.stopPropagation();backlog()};$('#save-btn').onclick=e=>{e.stopPropagation();save()};$('#load-btn').onclick=e=>{e.stopPropagation();load()};$('#home-btn').onclick=()=>location.reload();$('#auto-btn').onclick=e=>{e.stopPropagation();state.auto=!state.auto;e.currentTarget.classList.toggle('on',state.auto);if(state.auto&&!state.typing)next()};$('#skip-btn').onclick=e=>{e.stopPropagation();state.skip=!state.skip;e.currentTarget.classList.toggle('on',state.skip);if(state.skip&&!state.typing)next()};$('#music-btn').onclick=e=>{e.stopPropagation();toggleMusic(e.currentTarget)};dialogue.onclick=next;document.addEventListener('keydown',e=>{if(game.classList.contains('active')&&(e.key==='Enter'||e.key===' ')){e.preventDefault();next()}if(e.key==='Escape'&&modal.open)modal.close()});
 $('#continue-btn').disabled=!localStorage.getItem('changzhong-save');
 const deepLinkChapter=new URLSearchParams(location.search).get('chapter');
