@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#17213d" />
+  <meta name="description" content="《常中星下，与你相遇》——萧楚南与熊莉的全年龄纯甜校园视觉小说。" />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="zh_CN" />
+  <meta property="og:title" content="常中星下，与你相遇" />
+  <meta property="og:description" content="一段从九月开学典礼延伸到春日星空的纯甜校园故事。" />
+  <meta property="og:url" content="https://emojie23.github.io/changzhong-star-galgame/" />
+  <meta property="og:image" content="https://emojie23.github.io/changzhong-star-galgame/assets/campus-stars.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <title>常中星下，与你相遇</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main id="app" aria-live="polite">
+    <section id="title-screen" class="screen active">
+      <div class="title-shade"></div>
+      <div class="title-wrap">
+        <p class="eyebrow">A SWEET CAMPUS STORY</p>
+        <h1>常中星下<br><span>与你相遇</span></h1>
+        <p class="subtitle">萧楚南 × 熊莉 · 全年龄纯爱视觉小说</p>
+        <nav class="title-menu" aria-label="主菜单">
+          <button id="start-btn" class="primary">开始故事 <small>NEW GAME</small></button>
+          <button id="continue-btn">继续 <small>CONTINUE</small></button>
+          <button id="chapter-btn">章节回想 <small>CHAPTERS</small></button>
+          <button id="about-btn">创作说明 <small>ABOUT</small></button>
+        </nav>
+        <p class="title-note">建议游玩 45–65 分钟 · 耳机体验更佳</p>
+      </div>
+    </section>
+
+    <section id="game-screen" class="screen">
+      <div id="bg" class="scene-bg"></div>
+      <div class="grain"></div>
+      <div id="location-card" class="location-card"><span>01</span><div><b>南门</b><small>罗汉路 · 九月</small></div></div>
+      <img id="heroine" class="heroine" src="assets/xiongli-cutout.png" alt="熊莉角色立绘" />
+      <div id="chapter-splash" class="chapter-splash" hidden></div>
+
+      <aside class="topbar">
+        <button id="home-btn" title="返回标题">⌂</button>
+        <div class="progress"><i id="progress-fill"></i></div>
+        <div id="track-chip" class="track-chip" title="当前配乐"><span>♫</span><b>九月晨光</b></div>
+        <button id="map-btn">校园导览</button>
+      </aside>
+
+      <aside id="relationship-hud" class="relationship-hud" aria-label="攻略进度">
+        <header><span>攻略进度</span><strong id="route-percent">0%</strong></header>
+        <div class="stat stat-heart"><label>心动</label><i><b id="heart-bar"></b></i><em id="heart-value">0</em></div>
+        <div class="stat stat-trust"><label>信赖</label><i><b id="trust-bar"></b></i><em id="trust-value">0</em></div>
+        <div class="stat stat-harmony"><label>默契</label><i><b id="harmony-bar"></b></i><em id="harmony-value">0</em></div>
+      </aside>
+      <div id="stat-gain" class="stat-gain"></div>
+
+      <section id="dialogue" class="dialogue" tabindex="0">
+        <div class="speaker-row"><span id="speaker">旁白</span><small id="speaker-en">NARRATION</small></div>
+        <p id="text"></p>
+        <span class="next-mark">⌄</span>
+        <div id="choices" class="choices"></div>
+        <footer class="controls">
+          <button id="backlog-btn">回看</button>
+          <button id="save-btn">存档</button>
+          <button id="load-btn">读档</button>
+          <button id="auto-btn">自动</button>
+          <button id="skip-btn">快进</button>
+          <button id="music-btn">♪ 音乐 42%</button>
+        </footer>
+      </section>
+    </section>
+  </main>
+
+  <dialog id="modal">
+    <button id="modal-close" class="modal-close">×</button>
+    <div id="modal-content"></div>
+  </dialog>
+
+  <script src="game.js"></script>
+</body>
+</html>
